@@ -15,18 +15,19 @@
     --text: #e8eaf0;
     --muted: #6b7280;
     --accent: #4a9eff;
-    --accent2: #34d399;
-    --warn: #f59e0b;
     --rain: #60a5fa;
     --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
   }
 
-  body {
+  html, body {
+    width: 100%; height: 100dvh;
+    overflow: hidden;
     background: var(--bg);
     color: var(--text);
     font-family: var(--font);
-    height: 100dvh;
-    overflow: hidden;
+  }
+
+  body {
     display: grid;
     grid-template-rows: auto 1fr auto;
     grid-template-columns: 1fr 1fr;
@@ -34,9 +35,8 @@
       "header header"
       "left   right"
       "footer footer";
-    gap: 0;
-    padding: 12px;
-    gap: 10px;
+    padding: 1.2vh 1.5vw;
+    gap: 1vh;
   }
 
   /* ── HEADER ── */
@@ -45,10 +45,11 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding-bottom: 0.4vh;
   }
 
   .clock {
-    font-size: clamp(2.4rem, 7vw, 4rem);
+    font-size: clamp(1.6rem, 5.5vh, 3.2rem);
     font-weight: 200;
     letter-spacing: -0.03em;
     line-height: 1;
@@ -56,22 +57,24 @@
   .clock span { color: var(--muted); font-size: 0.45em; font-weight: 400; margin-left: 6px; }
 
   .date-loc { text-align: right; }
-  .date-loc .date { font-size: clamp(0.75rem, 2vw, 1rem); color: var(--muted); }
-  .date-loc .station { font-size: clamp(0.6rem, 1.5vw, 0.8rem); color: var(--muted); opacity: 0.6; margin-top: 2px; }
+  .date-loc .date { font-size: clamp(0.65rem, 1.6vh, 0.9rem); color: var(--muted); }
+  .date-loc .station { font-size: clamp(0.55rem, 1.2vh, 0.75rem); color: var(--muted); opacity: 0.6; margin-top: 1px; }
 
-  /* ── MAIN TEMP BLOCK ── */
+  /* ── LEFT COL ── */
   .left-col {
     grid-area: left;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 1vh;
+    min-height: 0;
   }
 
+  /* current conditions */
   .temp-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 14px 18px;
+    border-radius: 14px;
+    padding: 1.2vh 1.4vw;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -79,7 +82,7 @@
   }
 
   .current-temp {
-    font-size: clamp(3rem, 10vw, 5.5rem);
+    font-size: clamp(2rem, 7vh, 4.5rem);
     font-weight: 100;
     letter-spacing: -0.04em;
     line-height: 1;
@@ -87,104 +90,114 @@
   .current-temp sup { font-size: 0.35em; font-weight: 300; vertical-align: super; }
 
   .temp-meta { text-align: right; }
-  .feels { font-size: clamp(0.7rem, 1.8vw, 0.9rem); color: var(--muted); }
-  .hi-lo { font-size: clamp(0.85rem, 2.2vw, 1.1rem); margin-top: 4px; }
+  .feels { font-size: clamp(0.6rem, 1.5vh, 0.82rem); color: var(--muted); }
+  .hi-lo { font-size: clamp(0.7rem, 1.8vh, 1rem); margin-top: 2px; }
   .hi-lo .hi { color: #f87171; }
-  .hi-lo .lo { color: var(--rain); margin-left: 10px; }
-  .condition { font-size: clamp(0.75rem, 1.8vw, 0.95rem); color: var(--muted); margin-top: 4px; }
+  .hi-lo .lo { color: var(--rain); margin-left: 8px; }
+  .condition { font-size: clamp(0.6rem, 1.4vh, 0.82rem); color: var(--muted); margin-top: 2px; }
 
-  /* wind / humidity / pressure row */
+  /* stats row */
   .stats-row {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    gap: 0.8vw;
     flex: 0 0 auto;
   }
 
   .stat-tile {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 10px 12px;
+    border-radius: 10px;
+    padding: 0.8vh 0.8vw;
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 2px;
   }
-  .stat-label { font-size: clamp(0.55rem, 1.3vw, 0.7rem); color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
-  .stat-value { font-size: clamp(1rem, 2.8vw, 1.5rem); font-weight: 300; }
-  .stat-sub { font-size: clamp(0.55rem, 1.2vw, 0.68rem); color: var(--muted); }
+  .stat-label { font-size: clamp(0.5rem, 1.1vh, 0.65rem); color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  .stat-value { font-size: clamp(0.85rem, 2.2vh, 1.3rem); font-weight: 300; }
+  .stat-sub { font-size: clamp(0.5rem, 1vh, 0.62rem); color: var(--muted); }
 
-  /* hourly rain chart */
-  .rain-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 12px 14px;
-    flex: 0 0 auto;
-    display: flex;
-    flex-direction: column;
-  }
-  .card-title { font-size: clamp(0.6rem, 1.4vw, 0.75rem); color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
-
-  #rain-chart { width: 100%; height: 80px; }
-
-  /* ── RIGHT COL ── */
-  .right-col {
-    grid-area: right;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  /* 5-day forecast */
+  /* 5-day forecast — horizontal cards */
   .forecast-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 12px 14px;
+    border-radius: 14px;
+    padding: 1vh 1vw;
     flex: 0 0 auto;
   }
-  #forecast-rows { display: flex; flex-direction: column; }
 
-  .forecast-row {
-    display: grid;
-    grid-template-columns: 2fr 0.8fr 0.9fr 0.9fr 1.1fr;
-    align-items: center;
-    padding: 5px 0;
-    font-size: clamp(0.7rem, 1.7vw, 0.88rem);
-    border-bottom: 1px solid var(--border);
+  .card-title {
+    font-size: clamp(0.5rem, 1.1vh, 0.65rem);
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.6vh;
   }
-  .forecast-row:last-child { border-bottom: none; }
-  .forecast-day { color: var(--text); }
-  .forecast-icon { text-align: center; font-size: 1em; }
-  .forecast-hi { color: #f87171; text-align: right; }
-  .forecast-lo { color: var(--rain); text-align: right; }
-  .forecast-precip { color: #60a5fa; text-align: right; font-size: clamp(0.6rem, 1.4vw, 0.78rem); }
 
-  /* radar — fills entire right col */
-  .radar-card {
+  #forecast-days {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5vw;
+  }
+
+  .fday {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 0.6vh 0.3vw;
+    border-radius: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+  }
+  .fday-name { font-size: clamp(0.5rem, 1.1vh, 0.65rem); color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .fday-icon { font-size: clamp(0.9rem, 2.2vh, 1.3rem); line-height: 1; }
+  .fday-hi { font-size: clamp(0.65rem, 1.5vh, 0.85rem); color: #f87171; font-weight: 500; }
+  .fday-lo { font-size: clamp(0.55rem, 1.2vh, 0.72rem); color: var(--rain); }
+  .fday-precip { font-size: clamp(0.5rem, 1.1vh, 0.62rem); color: #93c5fd; }
+
+  /* rain chart — very compact */
+  .rain-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 16px;
-    overflow: hidden;
+    border-radius: 14px;
+    padding: 0.8vh 1vw;
     flex: 1 1 auto;
     min-height: 0;
-    position: relative;
     display: flex;
     flex-direction: column;
   }
+  .rain-wrap { flex: 1; min-height: 0; position: relative; }
+  #rain-chart { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  /* ── RIGHT COL — full height radar ── */
+  .right-col {
+    grid-area: right;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .radar-card {
+    flex: 1 1 auto;
+    min-height: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+  }
   .radar-label {
     position: absolute;
-    top: 8px;
-    left: 10px;
-    font-size: 0.65rem;
-    color: rgba(255,255,255,0.5);
+    top: 7px; left: 9px;
+    font-size: 0.6rem;
+    color: rgba(255,255,255,0.45);
     text-transform: uppercase;
     letter-spacing: 0.08em;
     z-index: 10;
     pointer-events: none;
   }
-  #radar-map { width: 100%; height: 100%; border: none; flex: 1; }
+  #radar-map { width: 100%; height: 100%; border: none; display: block; }
 
   /* ── FOOTER ── */
   footer {
@@ -194,16 +207,16 @@
     justify-content: space-between;
   }
   .uv-bar { display: flex; align-items: center; gap: 8px; }
-  .uv-track { width: 80px; height: 5px; border-radius: 3px; background: linear-gradient(to right, #34d399, #f59e0b, #ef4444); position: relative; }
-  .uv-dot { width: 9px; height: 9px; border-radius: 50%; background: white; position: absolute; top: -2px; transform: translateX(-50%); border: 1.5px solid var(--bg); }
-  .uv-text { font-size: 0.75rem; color: var(--muted); }
-  .last-updated { font-size: 0.65rem; color: var(--muted); opacity: 0.5; }
-  .refresh-btn { font-size: 0.65rem; color: var(--accent); background: none; border: none; cursor: pointer; opacity: 0.7; padding: 4px 8px; }
+  .uv-track { width: 70px; height: 4px; border-radius: 3px; background: linear-gradient(to right, #34d399, #f59e0b, #ef4444); position: relative; }
+  .uv-dot { width: 8px; height: 8px; border-radius: 50%; background: white; position: absolute; top: -2px; transform: translateX(-50%); border: 1.5px solid var(--bg); }
+  .uv-text { font-size: clamp(0.55rem, 1.2vh, 0.7rem); color: var(--muted); }
+  .last-updated { font-size: clamp(0.5rem, 1.1vh, 0.62rem); color: var(--muted); opacity: 0.5; }
+  .refresh-btn { font-size: clamp(0.5rem, 1.1vh, 0.62rem); color: var(--accent); background: none; border: none; cursor: pointer; opacity: 0.7; padding: 3px 6px; }
 
   /* config overlay */
   #config-overlay {
     position: fixed; inset: 0;
-    background: rgba(0,0,0,0.85);
+    background: rgba(0,0,0,0.88);
     display: flex; align-items: center; justify-content: center;
     z-index: 100;
   }
@@ -234,11 +247,10 @@
 </head>
 <body>
 
-<!-- Config overlay (shown until token is entered) -->
 <div id="config-overlay">
   <div id="config-box">
     <h2>Tempest bedside setup</h2>
-    <p>Enter your WeatherFlow Tempest API token and station ID to get started. These are saved locally on this device only.</p>
+    <p>Enter your WeatherFlow Tempest API token and station ID. Saved locally on this device only.</p>
     <label class="cfg-label">API token</label>
     <input class="cfg-input" id="cfg-token" type="password" placeholder="Your personal access token" autocomplete="off">
     <label class="cfg-label">Station ID</label>
@@ -259,6 +271,7 @@
 </header>
 
 <div class="left-col">
+
   <div class="temp-card">
     <div class="current-temp" id="cur-temp">--<sup>°F</sup></div>
     <div class="temp-meta">
@@ -286,17 +299,18 @@
     </div>
   </div>
 
-  <div class="rain-card">
-    <div class="card-title">Rain chance — next 12 hrs</div>
-    <canvas id="rain-chart"></canvas>
-  </div>
-
   <div class="forecast-card">
     <div class="card-title">5-day forecast</div>
-    <div id="forecast-rows">
-      <!-- filled by JS -->
+    <div id="forecast-days"></div>
+  </div>
+
+  <div class="rain-card">
+    <div class="card-title">Rain chance — next 12 hrs</div>
+    <div class="rain-wrap">
+      <canvas id="rain-chart"></canvas>
     </div>
   </div>
+
 </div>
 
 <div class="right-col">
@@ -321,7 +335,6 @@ const API_BASE = 'https://swd.weatherflow.com/swd/rest';
 let TOKEN = '', STATION_ID = '', LAT = null, LON = null;
 let rainChart = null;
 
-// ── Config ──────────────────────────────────────────────────────────────────
 function saveConfig() {
   const t = document.getElementById('cfg-token').value.trim();
   const s = document.getElementById('cfg-station').value.trim();
@@ -350,7 +363,6 @@ function loadConfig() {
   }
 }
 
-// ── Clock ────────────────────────────────────────────────────────────────────
 function updateClock() {
   const now = new Date();
   let h = now.getHours(), m = now.getMinutes();
@@ -364,7 +376,6 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
 const degToCard = d => ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'][Math.round(d/22.5)%16];
 
 function conditionText(icon) {
@@ -384,15 +395,11 @@ function weatherEmoji(icon) {
   return map[icon] || '🌡';
 }
 
-// ── Fetch current observations ────────────────────────────────────────────────
 async function fetchObservations() {
   const r = await fetch(`${API_BASE}/observations/station/${STATION_ID}?token=${TOKEN}`);
   const d = await r.json();
   const obs = d.obs?.[0];
   if (!obs) return;
-
-  LAT = d.station_units ? null : LAT;
-  // grab lat/lon from station metadata if available
   if (d.latitude) LAT = d.latitude;
   if (d.longitude) LON = d.longitude;
 
@@ -415,13 +422,10 @@ async function fetchObservations() {
   const uv = obs.uv || 0;
   document.getElementById('uv-label').textContent = `UV ${uv.toFixed(1)}`;
   document.getElementById('uv-dot').style.left = Math.min(uv / 11 * 100, 100) + '%';
-
   document.getElementById('last-updated').textContent = `Updated ${new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`;
 }
 
-// ── Fetch forecast (Better Forecast endpoint) ──────────────────────────────
 async function fetchForecast() {
-  // Get station lat/lon first if needed
   if (!LAT || !LON) {
     try {
       const sr = await fetch(`${API_BASE}/stations/${STATION_ID}?token=${TOKEN}`);
@@ -435,39 +439,33 @@ async function fetchForecast() {
   const r = await fetch(`${API_BASE}/better_forecast?station_id=${STATION_ID}&token=${TOKEN}&units_temp=f&units_wind=mph&units_pressure=inhg&units_precip=in&units_distance=mi`);
   const d = await r.json();
 
-  // Current condition icon
   const cur = d.forecast?.current_conditions;
-  if (cur) {
-    document.getElementById('condition').textContent = conditionText(cur.icon);
-  }
+  if (cur) document.getElementById('condition').textContent = conditionText(cur.icon);
 
-  // Daily forecast
   const daily = d.forecast?.daily || [];
-  const rows = document.getElementById('forecast-rows');
-  rows.innerHTML = '';
+  const container = document.getElementById('forecast-days');
+  container.innerHTML = '';
   daily.slice(0, 5).forEach((day, i) => {
     const date = new Date(day.day_start_local * 1000);
     const dayName = i === 0 ? 'Today' : date.toLocaleDateString('en-US', {weekday: 'short'});
     const hiF = Math.round(day.air_temp_high);
     const loF = Math.round(day.air_temp_low);
     const precip = day.precip_probability != null ? `${Math.round(day.precip_probability)}%` : '--';
-    rows.innerHTML += `
-      <div class="forecast-row">
-        <span class="forecast-day">${dayName}</span>
-        <span class="forecast-icon">${weatherEmoji(day.icon)}</span>
-        <span class="forecast-hi">${hiF}°</span>
-        <span class="forecast-lo">${loF}°</span>
-        <span class="forecast-precip">💧${precip}</span>
+    container.innerHTML += `
+      <div class="fday">
+        <span class="fday-name">${dayName}</span>
+        <span class="fday-icon">${weatherEmoji(day.icon)}</span>
+        <span class="fday-hi">${hiF}°</span>
+        <span class="fday-lo">${loF}°</span>
+        <span class="fday-precip">💧${precip}</span>
       </div>`;
   });
 
-  // Today hi/lo
   if (daily[0]) {
     document.getElementById('t-hi').textContent = `H: ${Math.round(daily[0].air_temp_high)}°`;
     document.getElementById('t-lo').textContent = `L: ${Math.round(daily[0].air_temp_low)}°`;
   }
 
-  // Hourly rain chance chart
   const hourly = d.forecast?.hourly || [];
   const labels = [], data = [];
   hourly.slice(0, 12).forEach(h => {
@@ -480,7 +478,6 @@ async function fetchForecast() {
   drawRainChart(labels, data);
 }
 
-// ── Rain chart ───────────────────────────────────────────────────────────────
 function drawRainChart(labels, data) {
   const ctx = document.getElementById('rain-chart').getContext('2d');
   if (rainChart) rainChart.destroy();
@@ -490,51 +487,32 @@ function drawRainChart(labels, data) {
       labels,
       datasets: [{
         data,
-        backgroundColor: data.map(v => v > 50 ? 'rgba(96,165,250,0.8)' : 'rgba(96,165,250,0.35)'),
-        borderRadius: 4,
+        backgroundColor: data.map(v => v > 50 ? 'rgba(96,165,250,0.8)' : 'rgba(96,165,250,0.3)'),
+        borderRadius: 3,
         borderSkipped: false,
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: { label: ctx => `${ctx.raw}%` }
-        }
-      },
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => `${c.raw}%` } } },
       scales: {
-        x: {
-          grid: { display: false },
-          ticks: { color: '#6b7280', font: { size: 9 } },
-          border: { display: false }
-        },
-        y: {
-          min: 0, max: 100,
-          grid: { color: 'rgba(255,255,255,0.04)' },
-          ticks: { color: '#6b7280', font: { size: 9 }, callback: v => v + '%', stepSize: 50 },
-          border: { display: false }
-        }
+        x: { grid: { display: false }, ticks: { color: '#6b7280', font: { size: 8 } }, border: { display: false } },
+        y: { min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280', font: { size: 8 }, callback: v => v + '%', stepSize: 50 }, border: { display: false } }
       }
     }
   });
 }
 
-// ── Radar ────────────────────────────────────────────────────────────────────
 function loadRadar() {
   const lat = LAT || 40.5853;
   const lon = LON || -105.0844;
   const zoom = 9;
-  // sm=1 shows your location marker, sn=1 shows station name
   const radarUrl = `https://www.rainviewer.com/map.html?loc=${lat},${lon},${zoom}&oFa=0&oC=0&oU=0&oCS=1&oF=0&oAP=1&rmt=4&c=1&o=83&lm=1&layer=radar&sm=1&sn=1&hu=0&mark=${lat},${lon}`;
   const iframe = document.getElementById('radar-map');
-  // Only reload if lat/lon actually changed (avoid flicker on every refresh)
-  const newSrc = radarUrl;
-  if (iframe.src !== newSrc) iframe.src = newSrc;
+  if (iframe.src !== radarUrl) iframe.src = radarUrl;
 }
 
-// ── Master fetch ─────────────────────────────────────────────────────────────
 async function fetchAll() {
   try {
     await fetchObservations();
@@ -546,10 +524,7 @@ async function fetchAll() {
   }
 }
 
-// Refresh every 5 minutes
 setInterval(fetchAll, 5 * 60 * 1000);
-
-// Boot
 loadConfig();
 </script>
 </body>
