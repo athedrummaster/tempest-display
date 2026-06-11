@@ -521,12 +521,15 @@ function drawRainChart(labels, data) {
 
 // ── Radar ────────────────────────────────────────────────────────────────────
 function loadRadar() {
-  // RainViewer embed — free, loops automatically, dark-friendly
   const lat = LAT || 40.5853;
   const lon = LON || -105.0844;
-  const zoom = 7;
-  const radarUrl = `https://www.rainviewer.com/map.html?loc=${lat},${lon},${zoom}&oFa=0&oC=0&oU=0&oCS=1&oF=0&oAP=1&rmt=4&c=1&o=83&lm=0&layer=radar&sm=1&sn=1&hu=0`;
-  document.getElementById('radar-map').src = radarUrl;
+  const zoom = 9;
+  // sm=1 shows your location marker, sn=1 shows station name
+  const radarUrl = `https://www.rainviewer.com/map.html?loc=${lat},${lon},${zoom}&oFa=0&oC=0&oU=0&oCS=1&oF=0&oAP=1&rmt=4&c=1&o=83&lm=1&layer=radar&sm=1&sn=1&hu=0&mark=${lat},${lon}`;
+  const iframe = document.getElementById('radar-map');
+  // Only reload if lat/lon actually changed (avoid flicker on every refresh)
+  const newSrc = radarUrl;
+  if (iframe.src !== newSrc) iframe.src = newSrc;
 }
 
 // ── Master fetch ─────────────────────────────────────────────────────────────
