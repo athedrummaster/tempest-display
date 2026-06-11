@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Tempest Bedside</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0c10;
+    --surface: #13161c;
+    --surface2: #1c2029;
+    --border: rgba(255,255,255,0.07);
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --accent: #4a9eff;
+    --accent2: #34d399;
+    --warn: #f59e0b;
+    --rain: #60a5fa;
+    --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    height: 100dvh;
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "header header"
+      "left   right"
+      "footer footer";
+    gap: 0;
+    padding: 12px;
+    gap: 10px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    grid-area: header;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .clock {
+    font-size: clamp(2.4rem, 7vw, 4rem);
+    font-weight: 200;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .clock span { color: var(--muted); font-size: 0.45em; font-weight: 400; margin-left: 6px; }
+
+  .date-loc { text-align: right; }
+  .date-loc .date { font-size: clamp(0.75rem, 2vw, 1rem); color: var(--muted); }
+  .date-loc .station { font-size: clamp(0.6rem, 1.5vw, 0.8rem); color: var(--muted); opacity: 0.6; margin-top: 2px; }
+
+  /* ── MAIN TEMP BLOCK ── */
+  .left-col {
+    grid-area: left;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .temp-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 0 0 auto;
+  }
+
+  .current-temp {
+    font-size: clamp(3rem, 10vw, 5.5rem);
+    font-weight: 100;
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+  .current-temp sup { font-size: 0.35em; font-weight: 300; vertical-align: super; }
+
+  .temp-meta { text-align: right; }
+  .feels { font-size: clamp(0.7rem, 1.8vw, 0.9rem); color: var(--muted); }
+  .hi-lo { font-size: clamp(0.85rem, 2.2vw, 1.1rem); margin-top: 4px; }
+  .hi-lo .hi { color: #f87171; }
+  .hi-lo .lo { color: var(--rain); margin-left: 10px; }
+  .condition { font-size: clamp(0.75rem, 1.8vw, 0.95rem); color: var(--muted); margin-top: 4px; }
+
+  /* wind / humidity / pressure row */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    flex: 0 0 auto;
+  }
+
+  .stat-tile {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .stat-label { font-size: clamp(0.55rem, 1.3vw, 0.7rem); color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  .stat-value { font-size: clamp(1rem, 2.8vw, 1.5rem); font-weight: 300; }
+  .stat-sub { font-size: clamp(0.55rem, 1.2vw, 0.68rem); color: var(--muted); }
+
+  /* hourly rain chart */
+  .rain-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 12px 14px;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .card-title { font-size: clamp(0.6rem, 1.4vw, 0.75rem); color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+
+  #rain-chart { width: 100%; flex: 1; }
+
+  /* ── RIGHT COL ── */
+  .right-col {
+    grid-area: right;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* 5-day forecast */
+  .forecast-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 12px 14px;
+    flex: 0 0 auto;
+  }
+
+  .forecast-row {
+    display: grid;
+    grid-template-columns: 2.5fr 1fr 1fr 1.2fr;
+    align-items: center;
+    padding: 5px 0;
+    font-size: clamp(0.7rem, 1.7vw, 0.88rem);
+    border-bottom: 1px solid var(--border);
+  }
+  .forecast-row:last-child { border-bottom: none; }
+  .forecast-day { color: var(--text); }
+  .forecast-icon { text-align: center; font-size: 1em; }
+  .forecast-hi { color: #f87171; text-align: right; }
+  .forecast-lo { color: var(--rain); text-align: right; }
+
+  /* radar */
+  .radar-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    flex: 1 1 auto;
+    min-height: 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  .radar-label {
+    position: absolute;
+    top: 8px;
+    left: 10px;
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    z-index: 10;
+    pointer-events: none;
+  }
+  #radar-map { width: 100%; height: 100%; border: none; flex: 1; }
+
+  /* ── FOOTER ── */
+  footer {
+    grid-area: footer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .uv-bar { display: flex; align-items: center; gap: 8px; }
+  .uv-track { width: 80px; height: 5px; border-radius: 3px; background: linear-gradient(to right, #34d399, #f59e0b, #ef4444); position: relative; }
+  .uv-dot { width: 9px; height: 9px; border-radius: 50%; background: white; position: absolute; top: -2px; transform: translateX(-50%); border: 1.5px solid var(--bg); }
+  .uv-text { font-size: 0.75rem; color: var(--muted); }
+  .last-updated { font-size: 0.65rem; color: var(--muted); opacity: 0.5; }
+  .refresh-btn { font-size: 0.65rem; color: var(--accent); background: none; border: none; cursor: pointer; opacity: 0.7; padding: 4px 8px; }
+
+  /* config overlay */
+  #config-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100;
+  }
+  #config-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px 32px;
+    width: min(420px, 90vw);
+  }
+  #config-box h2 { font-size: 1.1rem; font-weight: 400; margin-bottom: 6px; }
+  #config-box p { font-size: 0.78rem; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
+  .cfg-label { font-size: 0.72rem; color: var(--muted); margin-bottom: 5px; display: block; }
+  .cfg-input {
+    width: 100%; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 14px; color: var(--text);
+    font-size: 0.9rem; margin-bottom: 14px; font-family: var(--font);
+  }
+  .cfg-input:focus { outline: none; border-color: var(--accent); }
+  .cfg-btn {
+    width: 100%; background: var(--accent); color: #fff; border: none;
+    border-radius: 10px; padding: 12px; font-size: 0.9rem;
+    cursor: pointer; font-family: var(--font);
+  }
+  .cfg-link { font-size: 0.7rem; color: var(--muted); margin-top: 12px; text-align: center; display: block; }
+  .cfg-link a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- Config overlay (shown until token is entered) -->
+<div id="config-overlay">
+  <div id="config-box">
+    <h2>Tempest bedside setup</h2>
+    <p>Enter your WeatherFlow Tempest API token and station ID to get started. These are saved locally on this device only.</p>
+    <label class="cfg-label">API token</label>
+    <input class="cfg-input" id="cfg-token" type="password" placeholder="Your personal access token" autocomplete="off">
+    <label class="cfg-label">Station ID</label>
+    <input class="cfg-input" id="cfg-station" type="text" placeholder="e.g. 12345" autocomplete="off">
+    <label class="cfg-label">Location name (optional)</label>
+    <input class="cfg-input" id="cfg-name" type="text" placeholder="e.g. Backyard">
+    <button class="cfg-btn" onclick="saveConfig()">Start display</button>
+    <span class="cfg-link">Find your token at <a href="https://tempestwx.com/settings/tokens" target="_blank">tempestwx.com/settings/tokens</a></span>
+  </div>
+</div>
+
+<header>
+  <div class="clock" id="clock">--:-- <span id="ampm">--</span></div>
+  <div class="date-loc">
+    <div class="date" id="date-str">---</div>
+    <div class="station" id="station-name">Tempest</div>
+  </div>
+</header>
+
+<div class="left-col">
+  <div class="temp-card">
+    <div class="current-temp" id="cur-temp">--<sup>°F</sup></div>
+    <div class="temp-meta">
+      <div class="feels" id="feels-like">Feels like --°</div>
+      <div class="hi-lo"><span class="hi" id="t-hi">H: --°</span><span class="lo" id="t-lo">L: --°</span></div>
+      <div class="condition" id="condition">--</div>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-tile">
+      <div class="stat-label">Wind</div>
+      <div class="stat-value" id="wind-spd">--</div>
+      <div class="stat-sub" id="wind-dir">--</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">Humidity</div>
+      <div class="stat-value" id="humidity">--%</div>
+      <div class="stat-sub" id="dewpoint">Dew --°</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">Pressure</div>
+      <div class="stat-value" id="pressure">--</div>
+      <div class="stat-sub" id="pressure-trend">--</div>
+    </div>
+  </div>
+
+  <div class="rain-card">
+    <div class="card-title">Rain chance — next 12 hrs</div>
+    <canvas id="rain-chart"></canvas>
+  </div>
+</div>
+
+<div class="right-col">
+  <div class="forecast-card">
+    <div class="card-title">5-day forecast</div>
+    <div id="forecast-rows">
+      <!-- filled by JS -->
+    </div>
+  </div>
+
+  <div class="radar-card">
+    <div class="radar-label">Live radar</div>
+    <iframe id="radar-map" title="Live radar" allowfullscreen></iframe>
+  </div>
+</div>
+
+<footer>
+  <div class="uv-bar">
+    <div class="uv-text" id="uv-label">UV --</div>
+    <div class="uv-track"><div class="uv-dot" id="uv-dot" style="left:0%"></div></div>
+  </div>
+  <div class="last-updated" id="last-updated">--</div>
+  <button class="refresh-btn" onclick="fetchAll()">↻ Refresh</button>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+const API_BASE = 'https://swd.weatherflow.com/swd/rest';
+let TOKEN = '', STATION_ID = '', LAT = null, LON = null;
+let rainChart = null;
+
+// ── Config ──────────────────────────────────────────────────────────────────
+function saveConfig() {
+  const t = document.getElementById('cfg-token').value.trim();
+  const s = document.getElementById('cfg-station').value.trim();
+  const n = document.getElementById('cfg-name').value.trim();
+  if (!t || !s) { alert('Please enter both your API token and station ID.'); return; }
+  TOKEN = t; STATION_ID = s;
+  localStorage.setItem('tw_token', t);
+  localStorage.setItem('tw_station', s);
+  localStorage.setItem('tw_name', n);
+  document.getElementById('station-name').textContent = n || 'Tempest';
+  document.getElementById('config-overlay').style.display = 'none';
+  fetchAll();
+}
+
+function loadConfig() {
+  TOKEN = localStorage.getItem('tw_token') || '';
+  STATION_ID = localStorage.getItem('tw_station') || '';
+  const name = localStorage.getItem('tw_name') || 'Tempest';
+  document.getElementById('station-name').textContent = name;
+  if (TOKEN && STATION_ID) {
+    document.getElementById('config-overlay').style.display = 'none';
+    fetchAll();
+  } else {
+    document.getElementById('cfg-token').value = TOKEN;
+    document.getElementById('cfg-station').value = STATION_ID;
+  }
+}
+
+// ── Clock ────────────────────────────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  let h = now.getHours(), m = now.getMinutes();
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  document.getElementById('clock').innerHTML = `${h}:${String(m).padStart(2,'0')} <span id="ampm">${ampm}</span>`;
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('date-str').textContent = `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+const degToCard = d => ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'][Math.round(d/22.5)%16];
+
+function conditionText(icon) {
+  const map = {
+    'clear-day':'Clear','clear-night':'Clear','partly-cloudy-day':'Partly cloudy',
+    'partly-cloudy-night':'Partly cloudy','cloudy':'Cloudy','rain':'Rain',
+    'sleet':'Sleet','snow':'Snow','wind':'Windy','fog':'Foggy','thunderstorm':'Thunderstorm'
+  };
+  return map[icon] || icon || '--';
+}
+
+function weatherEmoji(icon) {
+  const map = {
+    'clear-day':'☀️','clear-night':'🌙','partly-cloudy-day':'⛅','partly-cloudy-night':'🌥',
+    'cloudy':'☁️','rain':'🌧','sleet':'🌨','snow':'❄️','wind':'💨','fog':'🌫','thunderstorm':'⛈'
+  };
+  return map[icon] || '🌡';
+}
+
+// ── Fetch current observations ────────────────────────────────────────────────
+async function fetchObservations() {
+  const r = await fetch(`${API_BASE}/observations/station/${STATION_ID}?token=${TOKEN}`);
+  const d = await r.json();
+  const obs = d.obs?.[0];
+  if (!obs) return;
+
+  LAT = d.station_units ? null : LAT;
+  // grab lat/lon from station metadata if available
+  if (d.latitude) LAT = d.latitude;
+  if (d.longitude) LON = d.longitude;
+
+  const tempF = Math.round(obs.air_temperature * 9/5 + 32);
+  const feelF = Math.round((obs.feels_like || obs.air_temperature) * 9/5 + 32);
+  const windMph = Math.round(obs.wind_avg * 2.237);
+  const dewF = obs.dew_point ? Math.round(obs.dew_point * 9/5 + 32) : '--';
+  const pres = obs.sea_level_pressure ? obs.sea_level_pressure.toFixed(2) : '--';
+  const presTrend = obs.pressure_trend === 'rising' ? '↑ Rising' : obs.pressure_trend === 'falling' ? '↓ Falling' : '→ Steady';
+
+  document.getElementById('cur-temp').innerHTML = `${tempF}<sup>°F</sup>`;
+  document.getElementById('feels-like').textContent = `Feels like ${feelF}°`;
+  document.getElementById('humidity').textContent = `${Math.round(obs.relative_humidity)}%`;
+  document.getElementById('dewpoint').textContent = `Dew ${dewF}°`;
+  document.getElementById('wind-spd').textContent = `${windMph} mph`;
+  document.getElementById('wind-dir').textContent = degToCard(obs.wind_direction || 0);
+  document.getElementById('pressure').textContent = `${pres}"`;
+  document.getElementById('pressure-trend').textContent = presTrend;
+
+  const uv = obs.uv || 0;
+  document.getElementById('uv-label').textContent = `UV ${uv.toFixed(1)}`;
+  document.getElementById('uv-dot').style.left = Math.min(uv / 11 * 100, 100) + '%';
+
+  document.getElementById('last-updated').textContent = `Updated ${new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`;
+}
+
+// ── Fetch forecast (Better Forecast endpoint) ──────────────────────────────
+async function fetchForecast() {
+  // Get station lat/lon first if needed
+  if (!LAT || !LON) {
+    try {
+      const sr = await fetch(`${API_BASE}/stations/${STATION_ID}?token=${TOKEN}`);
+      const sd = await sr.json();
+      const st = sd.stations?.[0];
+      if (st) { LAT = st.latitude; LON = st.longitude; }
+    } catch(e) {}
+  }
+  if (!LAT || !LON) return;
+
+  const r = await fetch(`${API_BASE}/better_forecast?station_id=${STATION_ID}&token=${TOKEN}&units_temp=f&units_wind=mph&units_pressure=inhg&units_precip=in&units_distance=mi`);
+  const d = await r.json();
+
+  // Current condition icon
+  const cur = d.forecast?.current_conditions;
+  if (cur) {
+    document.getElementById('condition').textContent = conditionText(cur.icon);
+  }
+
+  // Daily forecast
+  const daily = d.forecast?.daily || [];
+  const rows = document.getElementById('forecast-rows');
+  rows.innerHTML = '';
+  daily.slice(0, 5).forEach((day, i) => {
+    const date = new Date(day.day_start_local * 1000);
+    const dayName = i === 0 ? 'Today' : date.toLocaleDateString('en-US', {weekday: 'short'});
+    const hiF = Math.round(day.air_temp_high);
+    const loF = Math.round(day.air_temp_low);
+    const hi = day.precip_probability || 0;
+    rows.innerHTML += `
+      <div class="forecast-row">
+        <span class="forecast-day">${dayName}</span>
+        <span class="forecast-icon">${weatherEmoji(day.icon)}</span>
+        <span class="forecast-hi">${hiF}°</span>
+        <span class="forecast-lo">${loF}°</span>
+      </div>`;
+  });
+
+  // Today hi/lo
+  if (daily[0]) {
+    document.getElementById('t-hi').textContent = `H: ${Math.round(daily[0].air_temp_high)}°`;
+    document.getElementById('t-lo').textContent = `L: ${Math.round(daily[0].air_temp_low)}°`;
+  }
+
+  // Hourly rain chance chart
+  const hourly = d.forecast?.hourly || [];
+  const labels = [], data = [];
+  hourly.slice(0, 12).forEach(h => {
+    const hDate = new Date(h.time * 1000);
+    let hr = hDate.getHours() % 12 || 12;
+    const ap = hDate.getHours() >= 12 ? 'p' : 'a';
+    labels.push(`${hr}${ap}`);
+    data.push(h.precip_probability || 0);
+  });
+  drawRainChart(labels, data);
+}
+
+// ── Rain chart ───────────────────────────────────────────────────────────────
+function drawRainChart(labels, data) {
+  const ctx = document.getElementById('rain-chart').getContext('2d');
+  if (rainChart) rainChart.destroy();
+  rainChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: data.map(v => v > 50 ? 'rgba(96,165,250,0.8)' : 'rgba(96,165,250,0.35)'),
+        borderRadius: 4,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: { label: ctx => `${ctx.raw}%` }
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { color: '#6b7280', font: { size: 9 } },
+          border: { display: false }
+        },
+        y: {
+          min: 0, max: 100,
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { color: '#6b7280', font: { size: 9 }, callback: v => v + '%', stepSize: 50 },
+          border: { display: false }
+        }
+      }
+    }
+  });
+}
+
+// ── Radar ────────────────────────────────────────────────────────────────────
+function loadRadar() {
+  // RainViewer embed — free, loops automatically, dark-friendly
+  const lat = LAT || 40.5853;
+  const lon = LON || -105.0844;
+  const zoom = 7;
+  const radarUrl = `https://www.rainviewer.com/map.html?loc=${lat},${lon},${zoom}&oFa=0&oC=0&oU=0&oCS=1&oF=0&oAP=1&rmt=4&c=1&o=83&lm=0&layer=radar&sm=1&sn=1&hu=0`;
+  document.getElementById('radar-map').src = radarUrl;
+}
+
+// ── Master fetch ─────────────────────────────────────────────────────────────
+async function fetchAll() {
+  try {
+    await fetchObservations();
+    await fetchForecast();
+    loadRadar();
+  } catch(e) {
+    console.error('Fetch error:', e);
+    document.getElementById('last-updated').textContent = 'Error — tap refresh';
+  }
+}
+
+// Refresh every 5 minutes
+setInterval(fetchAll, 5 * 60 * 1000);
+
+// Boot
+loadConfig();
+</script>
+</body>
+</html>
