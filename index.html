@@ -545,6 +545,45 @@ function drawRainChart(labels, data) {
   });
 }
 
+
+function getMoonData() {
+  const now = new Date();
+  const knownNewMoon = new Date('2000-01-06T18:14:00Z');
+  const synodicMonth = 29.53058867;
+  const msPerDay = 86400000;
+  const daysSinceRef = (now - knownNewMoon) / msPerDay;
+  const cyclePos = ((daysSinceRef % synodicMonth) + synodicMonth) % synodicMonth;
+
+  let phaseName, phaseIcon;
+  if (cyclePos < 1.85)       { phaseName = 'New moon';        phaseIcon = '🌑'; }
+  else if (cyclePos < 7.38)  { phaseName = 'Waxing crescent'; phaseIcon = '🌒'; }
+  else if (cyclePos < 9.22)  { phaseName = 'First quarter';   phaseIcon = '🌓'; }
+  else if (cyclePos < 14.77) { phaseName = 'Waxing gibbous';  phaseIcon = '🌔'; }
+  else if (cyclePos < 16.61) { phaseName = 'Full moon';       phaseIcon = '🌕'; }
+  else if (cyclePos < 22.15) { phaseName = 'Waning gibbous';  phaseIcon = '🌖'; }
+  else if (cyclePos < 23.99) { phaseName = 'Last quarter';    phaseIcon = '🌗'; }
+  else                       { phaseName = 'Waning crescent'; phaseIcon = '🌘'; }
+
+  const daysToFull = cyclePos < 14.77
+    ? 14.77 - cyclePos
+    : synodicMonth - cyclePos + 14.77;
+  const daysToNew = synodicMonth - cyclePos;
+
+  const daysLabel = (d) => {
+    const n = Math.round(d);
+    if (n <= 0) return 'Tonight';
+    if (n === 1) return 'Tomorrow';
+    const dt = new Date(now.getTime() + d * msPerDay);
+    const mon = dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return mon + ' (' + n + 'd)';
+  };
+
+  document.getElementById('moon-icon').textContent = phaseIcon;
+  document.getElementById('moon-phase-name').textContent = phaseName;
+  document.getElementById('next-full').textContent = daysLabel(daysToFull);
+  document.getElementById('next-new').textContent = daysLabel(daysToNew);
+}
+
 function loadRadar() {
   const lat = LAT || 40.5853;
   const lon = LON || -105.0844;
