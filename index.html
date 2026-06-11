@@ -120,14 +120,13 @@
     border: 1px solid var(--border);
     border-radius: 16px;
     padding: 12px 14px;
-    flex: 1 1 auto;
-    min-height: 0;
+    flex: 0 0 auto;
     display: flex;
     flex-direction: column;
   }
   .card-title { font-size: clamp(0.6rem, 1.4vw, 0.75rem); color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
 
-  #rain-chart { width: 100%; flex: 1; }
+  #rain-chart { width: 100%; height: 80px; }
 
   /* ── RIGHT COL ── */
   .right-col {
@@ -145,10 +144,11 @@
     padding: 12px 14px;
     flex: 0 0 auto;
   }
+  #forecast-rows { display: flex; flex-direction: column; }
 
   .forecast-row {
     display: grid;
-    grid-template-columns: 2.5fr 1fr 1fr 1.2fr;
+    grid-template-columns: 2fr 0.8fr 0.9fr 0.9fr 1.1fr;
     align-items: center;
     padding: 5px 0;
     font-size: clamp(0.7rem, 1.7vw, 0.88rem);
@@ -159,8 +159,9 @@
   .forecast-icon { text-align: center; font-size: 1em; }
   .forecast-hi { color: #f87171; text-align: right; }
   .forecast-lo { color: var(--rain); text-align: right; }
+  .forecast-precip { color: #60a5fa; text-align: right; font-size: clamp(0.6rem, 1.4vw, 0.78rem); }
 
-  /* radar */
+  /* radar — fills entire right col */
   .radar-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -289,16 +290,16 @@
     <div class="card-title">Rain chance — next 12 hrs</div>
     <canvas id="rain-chart"></canvas>
   </div>
-</div>
 
-<div class="right-col">
   <div class="forecast-card">
     <div class="card-title">5-day forecast</div>
     <div id="forecast-rows">
       <!-- filled by JS -->
     </div>
   </div>
+</div>
 
+<div class="right-col">
   <div class="radar-card">
     <div class="radar-label">Live radar</div>
     <iframe id="radar-map" title="Live radar" allowfullscreen></iframe>
@@ -449,13 +450,14 @@ async function fetchForecast() {
     const dayName = i === 0 ? 'Today' : date.toLocaleDateString('en-US', {weekday: 'short'});
     const hiF = Math.round(day.air_temp_high);
     const loF = Math.round(day.air_temp_low);
-    const hi = day.precip_probability || 0;
+    const precip = day.precip_probability != null ? `${Math.round(day.precip_probability)}%` : '--';
     rows.innerHTML += `
       <div class="forecast-row">
         <span class="forecast-day">${dayName}</span>
         <span class="forecast-icon">${weatherEmoji(day.icon)}</span>
         <span class="forecast-hi">${hiF}°</span>
         <span class="forecast-lo">${loF}°</span>
+        <span class="forecast-precip">💧${precip}</span>
       </div>`;
   });
 
