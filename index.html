@@ -156,6 +156,29 @@
   .fday-lo { font-size: clamp(0.58rem, 1.25vh, 0.72rem); color: var(--rain); }
   .fday-precip { font-size: clamp(0.52rem, 1.15vh, 0.65rem); color: #93c5fd; }
 
+  /* moon phase card */
+  .moon-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 0.8vh 1vw;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 1.2vw;
+  }
+  .moon-phase-icon {
+    font-size: clamp(1.4rem, 3.5vh, 2.2rem);
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .moon-info { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+  .moon-phase-name { font-size: clamp(0.62rem, 1.5vh, 0.82rem); font-weight: 500; }
+  .moon-dates { display: flex; gap: 1.2vw; margin-top: 2px; }
+  .moon-next { display: flex; flex-direction: column; gap: 1px; }
+  .moon-next-label { font-size: clamp(0.45rem, 1vh, 0.58rem); color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .moon-next-val { font-size: clamp(0.55rem, 1.2vh, 0.7rem); color: var(--text); }
+
   /* rain chart — fixed small height */
   .rain-card {
     background: var(--surface);
@@ -302,6 +325,24 @@
   <div class="forecast-card">
     <div class="card-title">5-day forecast</div>
     <div id="forecast-days"></div>
+  </div>
+
+
+  <div class="moon-card">
+    <div class="moon-phase-icon" id="moon-icon">🌑</div>
+    <div class="moon-info">
+      <div class="moon-phase-name" id="moon-phase-name">--</div>
+      <div class="moon-dates">
+        <div class="moon-next">
+          <span class="moon-next-label">Full moon</span>
+          <span class="moon-next-val" id="next-full">--</span>
+        </div>
+        <div class="moon-next">
+          <span class="moon-next-label">New moon</span>
+          <span class="moon-next-val" id="next-new">--</span>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="rain-card">
@@ -518,6 +559,7 @@ async function fetchAll() {
     await fetchObservations();
     await fetchForecast();
     loadRadar();
+    getMoonData();
   } catch(e) {
     console.error('Fetch error:', e);
     document.getElementById('last-updated').textContent = 'Error — tap refresh';
