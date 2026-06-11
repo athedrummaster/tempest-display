@@ -122,8 +122,12 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 14px;
-    padding: 1vh 1vw;
-    flex: 0 0 auto;
+    padding: 1.5vh 1vw;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
   .card-title {
@@ -144,30 +148,29 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
-    padding: 0.6vh 0.3vw;
+    gap: 0.5vh;
+    padding: 1.2vh 0.3vw;
     border-radius: 8px;
     background: var(--surface2);
     border: 1px solid var(--border);
   }
-  .fday-name { font-size: clamp(0.5rem, 1.1vh, 0.65rem); color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
-  .fday-icon { font-size: clamp(0.9rem, 2.2vh, 1.3rem); line-height: 1; }
-  .fday-hi { font-size: clamp(0.65rem, 1.5vh, 0.85rem); color: #f87171; font-weight: 500; }
-  .fday-lo { font-size: clamp(0.55rem, 1.2vh, 0.72rem); color: var(--rain); }
-  .fday-precip { font-size: clamp(0.5rem, 1.1vh, 0.62rem); color: #93c5fd; }
+  .fday-name { font-size: clamp(0.55rem, 1.4vh, 0.78rem); color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .fday-icon { font-size: clamp(1.1rem, 3.2vh, 1.8rem); line-height: 1; }
+  .fday-hi { font-size: clamp(0.75rem, 2vh, 1.1rem); color: #f87171; font-weight: 500; }
+  .fday-lo { font-size: clamp(0.65rem, 1.6vh, 0.9rem); color: var(--rain); }
+  .fday-precip { font-size: clamp(0.55rem, 1.3vh, 0.72rem); color: #93c5fd; }
 
-  /* rain chart — very compact */
+  /* rain chart — fixed small height */
   .rain-card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 14px;
     padding: 0.8vh 1vw;
-    flex: 1 1 auto;
-    min-height: 0;
+    flex: 0 0 auto;
     display: flex;
     flex-direction: column;
   }
-  .rain-wrap { flex: 1; min-height: 0; position: relative; }
+  .rain-wrap { position: relative; height: 6vh; min-height: 44px; }
   #rain-chart { position: absolute; inset: 0; width: 100%; height: 100%; }
 
   /* ── RIGHT COL — full height radar ── */
